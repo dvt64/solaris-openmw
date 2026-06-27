@@ -1,6 +1,6 @@
 #include "linuxpath.hpp"
 
-#if defined(__linux__) || defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__OpenBSD__)
+#if defined(__linux__) || defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__OpenBSD__) || defined(__sun)
 
 #include <array>
 #include <cstring>
@@ -79,8 +79,12 @@ namespace Files
     {
         auto localPath = std::filesystem::current_path() / "";
 
-        static const std::filesystem::path statusPaths[]
-            = { "/proc/self/exe", "/proc/self/file", "/proc/curproc/exe", "/proc/curproc/file" };
+        static const std::filesystem::path statusPaths[] = {
+#if defined(__sun)
+            "/proc/self/path/a.out",
+#endif
+            "/proc/self/exe", "/proc/self/file", "/proc/curproc/exe", "/proc/curproc/file"
+        };
 
         for (const auto& path : statusPaths)
         {
@@ -130,4 +134,4 @@ namespace Files
 
 } /* namespace Files */
 
-#endif /* defined(__linux__) || defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__OpenBSD__) */
+#endif /* defined(__linux__) || defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__OpenBSD__) || defined(__sun) */

@@ -1,0 +1,24 @@
+--- a/lib/CMakeLists.txt
++++ b/lib/CMakeLists.txt
+@@ -21,6 +21,10 @@ set(LIBUNSHIELD_SOURCES
+     log.c
+ )
+ 
++if(USE_OUR_OWN_MD5 AND BUILD_STATIC)
++    list(APPEND LIBUNSHIELD_SOURCES md5/md5c.c)
++endif()
++
+ if(BUILD_STATIC)
+     add_library(libunshield STATIC ${LIBUNSHIELD_HEADERS} ${LIBUNSHIELD_SOURCES})
+ else()
+@@ -36,7 +40,9 @@ set_target_properties(libunshield PROPERTIES OUTPUT_NAME unshield)
+ set_target_properties(libunshield PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION ${PROJECT_VERSION_MAJOR})
+ 
+ if(USE_OUR_OWN_MD5)
+-    target_link_libraries(libunshield PRIVATE $<TARGET_OBJECTS:md5>)
++    if(NOT BUILD_STATIC)
++        target_link_libraries(libunshield PRIVATE $<TARGET_OBJECTS:md5>)
++    endif()
+ else()
+     target_link_libraries(libunshield PRIVATE OpenSSL::Crypto)
+ endif()

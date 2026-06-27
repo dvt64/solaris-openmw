@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#if defined(__linux__) || defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__OpenBSD__)
+#if defined(__linux__) || defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__OpenBSD__) || defined(__sun)
 #ifndef ANDROID
 #include <components/files/linuxpath.hpp>
 namespace Files

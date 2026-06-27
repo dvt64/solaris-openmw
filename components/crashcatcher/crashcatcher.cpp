@@ -13,7 +13,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/param.h>
+#if !defined(__sun)
 #include <sys/ptrace.h>
+#endif
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/utsname.h>
@@ -31,7 +33,7 @@
 #ifndef PR_SET_PTRACER
 #define PR_SET_PTRACER 0x59616d61
 #endif
-#elif defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__)
+#elif defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__sun)
 #include <signal.h>
 #endif
 
@@ -457,7 +459,11 @@ static void getExecPath(char** argv)
 
     Log(Debug::Warning) << "Failed to call proc_pidpath: " << std::generic_category().message(errno);
 #endif
-    const char* statusPaths[] = { "/proc/self/exe", "/proc/self/file", "/proc/curproc/exe", "/proc/curproc/file" };
+    const char* statusPaths[] = {
+#if defined(__sun)
+        "/proc/self/path/a.out",
+#endif
+        "/proc/self/exe", "/proc/self/file", "/proc/curproc/exe", "/proc/curproc/file" };
     memset(argv0, 0, sizeof(argv0));
 
     for (const char* path : statusPaths)
@@ -496,7 +502,7 @@ static bool crashCatcherInstallHandlers(char** argv)
     altss.ss_sp = altstack;
     altss.ss_flags = 0;
     altss.ss_size = SIGSTKSZ;
-    if (sigaltstack(&altss, nullptr) == -1)
+    if (sigaltstack(&altss, static_cast<stack_t*>(nullptr)) == -1)
     {
         Log(Debug::Error) << "Failed to call sigaltstack: " << std::generic_category().message(errno);
         return false;
@@ -514,7 +520,11 @@ static bool crashCatcherInstallHandlers(char** argv)
 
     for (const SignalInfo& signal : signals)
     {
+        #if defined(__sun)
+        if (::sigaction(signal.mCode, &sa, nullptr) == -1)
+#else
         if (sigaction(signal.mCode, &sa, nullptr) == -1)
+#endif
         {
             Log(Debug::Error) << "Failed to call sigaction for signal " << signal.mName << " (" << signal.mCode
                               << "): " << std::generic_category().message(errno);
