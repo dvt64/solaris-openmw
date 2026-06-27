@@ -8,7 +8,6 @@ PATCHES="$ROOT/patches"
 OSG_PLUGINS="$DEPS/osg-plugins/osgPlugins-3.6.5"
 export PATH="${HOME}/local/bin:${PATH}"
 
-"$PATCHES/apply-patches.sh" >/dev/null
 
 CD="$DEPS/collada-dom"
 OSG="$DEPS/osg"

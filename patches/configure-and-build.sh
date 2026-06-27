@@ -53,7 +53,8 @@ if [ ! -d "$DEPS/collada-dom/.git" ]; then
   git -C "$DEPS/collada-dom" checkout "$COLLADA_TAG" 2>/dev/null || true
 fi
 cd "$DEPS/collada-dom"
-if patch -R -s -p1 --dry-run < "$PATCHES/collada-dom-minizip.patch" 2>/dev/null; then
+COLLADA_ZIP="dom/external-libs/minizip-1.1/zip.c"
+if grep -q "(const unsigned long \\*)get_crc_table()" "$COLLADA_ZIP" 2>/dev/null; then
   echo "already applied: collada-dom-minizip.patch"
 else
   patch -p1 -N < "$PATCHES/collada-dom-minizip.patch"
