@@ -39,8 +39,6 @@ if [ ! -f "$UNSHIELD_INSTALL/lib/libunshield.a" ]; then
   "$PATCHES/build-unshield.sh"
 fi
 
-"$PATCHES/apply-patches.sh" "$SRC"
-
 echo "==> deps: OpenMW/osg (osgdb_dae plugin)"
 if [ ! -d "$DEPS/osg/.git" ]; then
   git clone https://github.com/OpenMW/osg.git "$DEPS/osg"
